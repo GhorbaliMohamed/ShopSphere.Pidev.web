@@ -3,10 +3,11 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 #[ORM\Entity]
 #[ORM\Table(name: 'utilisateur', uniqueConstraints: [new ORM\UniqueConstraint(name: 'email', columns: ['email'])])]
-class Utilisateur
+class Utilisateur implements UserInterface,PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'IDENTITY')]
@@ -137,4 +138,43 @@ class Utilisateur
 
         return $this;
     }
+
+    public function getSalt(): ?string
+    {
+        return null;
+    }
+
+    /**
+     * @see UserInterface
+     */
+    public function eraseCredentials(): void
+    {
+        // If you store any temporary, sensitive data on the user, clear it here
+        // $this->plainPassword = null;
+    }
+
+    public function getUserIdentifier(): string
+    {
+        return (string) $this->email;
+    }
+    public function getUsername(): string
+    {
+        return (string) $this->email;
+    }
+
+    public function setUsername(string $email): static
+    {
+        $this->email = $email;
+
+        return $this;
+    }
+    public function getRoles(): array
+    {
+        
+        // guarantee every user at least has ROLE_USER
+        $roles[] = 'ROLE_USER';
+
+        return array_unique($roles);
+    }
+
 }
